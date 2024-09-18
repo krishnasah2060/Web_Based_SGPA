@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SGPA Calculator</title>
+    <!-- Google Fonts for better typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <style>
+        /* Reset some default styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Body Styling */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #f4f7f9;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        /* Container */
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .header p {
+            color: #7f8c8d;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table thead {
+            background-color: #2980b9;
+            color: #fff;
+        }
+
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #2980b9;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+            margin-right: 10px;
+        }
+
+        .btn:hover {
+            background-color: #1f6391;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        /* Result Display */
+        .result {
+            background-color: #27ae60;
+            color: #fff;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 1.2em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            table thead {
+                display: none;
+            }
+
+            table, table tbody, table tr, table td {
+                display: block;
+                width: 100%;
+            }
+
+            table tr {
+                margin-bottom: 15px;
+            }
+
+            table td {
+                text-align: right;
+                padding-left: 50%;
+                position: relative;
+            }
+
+            table td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 0;
+                width: 50%;
+                padding-left: 15px;
+                font-weight: bold;
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header">
+            <h1>SGPA Calculator</h1>
+            <p>Calculate your Semester Grade Point Average effortlessly</p>
+        </div>
+
+        <!-- Subjects Table -->
+        <table id="subjects-table">
+            <thead>
+                <tr>
+                    <th>Subject Name</th>
+                    <th>Credit Hours</th>
+                    <th>Grade Point</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="subjects-body">
+                <!-- Initial Row -->
+                <tr>
+                    <td data-label="Subject Name">
+                        <input type="text" placeholder="e.g., Mathematics" required>
+                    </td>
+                    <td data-label="Credit Hours">
+                        <input type="number" min="1" placeholder="e.g., 3" required>
+                    </td>
+                    <td data-label="Grade Point">
+                        <input type="number" min="0" max="10" step="0.1" placeholder="e.g., 8.5" required>
+                    </td>
+                    <td data-label="Action">
+                        <button class="btn btn-danger remove-btn">Remove</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Add Subject Button -->
+        <button class="btn" id="add-subject">Add Subject</button>
+
+        <!-- Calculate Button -->
+        <button class="btn" id="calculate-sgpa">Calculate SGPA</button>
+
+        <!-- Result Display -->
+        <div id="result" class="result" style="display: none;">
+            Your SGPA is: <span id="sgpa-value"></span>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript Code for SGPA Calculator
+
+        // Select DOM elements
+        const addSubjectBtn = document.getElementById('add-subject');
+        const subjectsBody = document.getElementById('subjects-body');
+        const calculateBtn = document.getElementById('calculate-sgpa');
+        const resultDiv = document.getElementById('result');
+        const sgpaValue = document.getElementById('sgpa-value');
+
+        // Function to add a new subject row
+        function addSubjectRow() {
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td data-label="Subject Name">
+                    <input type="text" placeholder="e.g., Physics" required>
+                </td>
+                <td data-label="Credit Hours">
+                    <input type="number" min="1" placeholder="e.g., 4" required>
+                </td>
+                <td data-label="Grade Point">
+                    <input type="number" min="0" max="10" step="0.1" placeholder="e.g., 9.0" required>
+                </td>
+                <td data-label="Action">
+                    <button class="btn btn-danger remove-btn">Remove</button>
+                </td>
+            `;
+
+            subjectsBody.appendChild(row);
+        }
+
+        // Function to remove a subject row
+        function removeSubjectRow(e) {
+            if (e.target.classList.contains('remove-btn')) {
+                const row = e.target.closest('tr');
+                row.remove();
+            }
+        }
+
+        // Function to calculate SGPA
+        function calculateSGPA() {
+            const rows = subjectsBody.querySelectorAll('tr');
+            let totalCredits = 0;
+            let totalPoints = 0;
+            let valid = true;
+
+            rows.forEach((row, index) => {
+                const inputs = row.querySelectorAll('input');
+                const subject = inputs[0].value.trim();
+                const credit = parseFloat(inputs[1].value);
+                const grade = parseFloat(inputs[2].value);
+
+                // Validation
+                if (subject === "" || isNaN(credit) || isNaN(grade)) {
+                    alert(`Please fill all fields correctly in row ${index + 1}.`);
+                    valid = false;
+                    return;
+                }
+
+                if (credit <= 0) {
+                    alert(`Credit hours must be greater than 0 in row ${index + 1}.`);
+                    valid = false;
+                    return;
+                }
+
+                if (grade < 0 || grade > 10) {
+                    alert(`Grade point must be between 0 and 10 in row ${index + 1}.`);
+                    valid = false;
+                    return;
+                }
+
+                totalCredits += credit;
+                totalPoints += credit * grade;
+            });
+
+            if (!valid) return;
+
+            if (totalCredits === 0) {
+                alert("Total credit hours cannot be zero.");
+                return;
+            }
+
+            const sgpa = (totalPoints / totalCredits).toFixed(2);
+            sgpaValue.textContent = sgpa;
+            resultDiv.style.display = 'block';
+        }
+
+        // Event Listeners
+        addSubjectBtn.addEventListener('click', addSubjectRow);
+        subjectsBody.addEventListener('click', removeSubjectRow);
+        calculateBtn.addEventListener('click', calculateSGPA);
+
+        // Initial Setup: Hide remove button if only one row exists
+        function toggleRemoveButtons() {
+            const removeButtons = document.querySelectorAll('.remove-btn');
+            if (removeButtons.length === 1) {
+                removeButtons[0].style.display = 'none';
+            } else {
+                removeButtons.forEach(btn => btn.style.display = 'inline-block');
+            }
+        }
+
+        // Call toggleRemoveButtons initially and after adding/removing rows
+        addSubjectRow(); // Adding a second row to ensure initial toggle
+        toggleRemoveButtons();
+
+        subjectsBody.addEventListener('DOMSubtreeModified', toggleRemoveButtons);
+    </script>
+</body>
+</html>
